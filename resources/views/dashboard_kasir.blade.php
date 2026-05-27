@@ -173,7 +173,8 @@
                             <th>No. Nota</th>
                             <th>Nama Pelanggan</th>
                             <th>No. HP</th>
-                            <th>Berat / Qty</th>
+                            <th>Jenis Layanan</th>
+                            <th>Jumlah Vol</th>
                             <th>Total Bayar</th>
                             <th class="text-center">Status Progres</th>
                             <th class="text-center" width="15%">Aksi</th>
@@ -186,7 +187,8 @@
                             <td class="fw-bold text-primary">{{ $pesanan->nomor_nota }}</td>
                             <td class="fw-semibold">{{ $pesanan->nama_pelanggan }}</td>
                             <td class="text-muted"><i class="fab fa-whatsapp text-success me-1"></i>{{ $pesanan->nomor_hp ?? '-' }}</td>
-                            <td class="fw-medium">{{ $pesanan->berat_kg ?? '0' }} Kg</td>
+                            <td class="fw-medium text-secondary">{{ $pesanan->nama_layanan ?? 'Reguler' }}</td>
+                            <td class="fw-medium">{{ $pesanan->berat_kg ?? '0' }} {{ $pesanan->jenis_satuan ?? 'Kg' }}</td>
                             <td class="fw-bold text-success">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</td>
                             <td class="text-center">
                                 @if(($pesanan->status ?? '') == 'Baru')
@@ -250,7 +252,7 @@
                         </div>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5 text-muted">
+                            <td colspan="9" class="text-center py-5 text-muted">
                                 <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
                                 <p class="m-0">Belum ada data transaksi di database laundry kamu.</p>
                             </td>
@@ -285,8 +287,24 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold text-muted">Berat Cucian (Kg)</label>
-                            <input type="number" step="0.1" id="inputBerat" name="berat" class="form-control bg-light" style="border-radius: 10px; padding: 10px;" placeholder="Contoh: 3.5" required>
+                            <label class="form-label small fw-semibold text-muted">Pilih Layanan Laundry</label>
+                            <select name="layanan_id" id="selectLayanan" class="form-select bg-light" style="border-radius: 10px; padding: 10px;" required>
+                                <option value="">-- Pilih Paket Layanan --</option>
+                                @if(isset($daftarLayanan) && count($daftarLayanan) > 0)
+                                    @foreach ($daftarLayanan as $layanan)
+                                        <option value="{{ $layanan->id }}" data-harga="{{ $layanan->harga }}" data-satuan="{{ $layanan->jenis_satuan }}">
+                                            [{{ $layanan->kategori ?? 'Paket' }}] {{ $layanan->nama_layanan }} - Rp {{ number_format($layanan->harga, 0, ',', '.') }}/{{ $layanan->jenis_satuan }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option value="" data-harga="7000" data-satuan="Kg">Cuci Kering Seterika Reguler (Default) - Rp 7.000/Kg</option>
+                                @endif
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label id="labelVolume" class="form-label small fw-semibold text-muted">Berat Cucian (Kg)</label>
+                            <input type="number" step="0.1" id="inputVolume" name="jumlah" class="form-control bg-light" style="border-radius: 10px; padding: 10px;" placeholder="Contoh: 3.5" required>
                         </div>
 
                         <div class="p-3 bg-light rounded-3 border border-dashed mb-1" style="border-radius: 12px;">
@@ -295,7 +313,7 @@
                                 <span class="h4 fw-bold text-success m-0" id="liveHarga">Rp 0</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                                <small class="text-muted text-xs">*Tarif flat Rp 7.000 / Kg</small>
+                                <small class="text-muted text-xs" id="textTarifInfo">*Tarif flat Rp 7.000 / Kg</small>
                                 <small class="text-primary fw-bold text-xs"><i class="fas fa-percentage me-1"></i>Diskon 10% Otomatis Khusus Member</small>
                             </div>
                         </div>
@@ -314,23 +332,44 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const inputBerat = document.getElementById('inputBerat');
+            const selectLayanan = document.getElementById('selectLayanan');
+            const inputVolume = document.getElementById('inputVolume');
+            const labelVolume = document.getElementById('labelVolume');
             const liveHarga = document.getElementById('liveHarga');
+            const textTarifInfo = document.getElementById('textTarifInfo');
             const inputNoHP = document.getElementById('inputNoHP');
-            const tarifPerKg = 7000;
+            let tarifPerUnit = 7000;
 
-            // 1. Hitung harga otomatis
-            inputBerat.addEventListener('input', function() {
-                const berat = parseFloat(this.value);
-                if (!isNaN(berat) && berat > 0) {
-                    const total = berat * tarifPerKg;
+            function hitungUlang() {
+                const vol = parseFloat(inputVolume.value);
+                if (!isNaN(vol) && vol > 0) {
+                    const total = vol * tarifPerUnit;
                     liveHarga.innerText = 'Rp ' + total.toLocaleString('id-ID');
                 } else {
                     liveHarga.innerText = 'Rp 0';
                 }
+            }
+
+            selectLayanan.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (this.value !== "") {
+                    tarifPerUnit = parseFloat(selectedOption.getAttribute('data-harga')) || 7000;
+                    const satuan = selectedOption.getAttribute('data-satuan') || 'Kg';
+                    
+                    labelVolume.innerText = "Jumlah Cucian (" + satuan + ")";
+                    inputVolume.placeholder = "Contoh: " + (satuan === 'Kg' ? '3.5' : '2');
+                    textTarifInfo.innerText = "*Tarif: Rp " + tarifPerUnit.toLocaleString('id-ID') + " / " + satuan;
+                } else {
+                    tarifPerUnit = 7000;
+                    labelVolume.innerText = "Berat Cucian (Kg)";
+                    inputVolume.placeholder = "Contoh: 3.5";
+                    textTarifInfo.innerText = "*Tarif flat Rp 7.000 / Kg";
+                }
+                hitungUlang();
             });
 
-            // 2. Proteksi Input Nomor HP (Hanya Angka & Maksimal 13 Digit)
+            inputVolume.addEventListener('input', hitungUlang);
+
             inputNoHP.addEventListener('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
                 if (this.value.length > 13) {

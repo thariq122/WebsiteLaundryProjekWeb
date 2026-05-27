@@ -18,7 +18,13 @@ class LaundryController extends Controller
     public function cekStatus(Request $request)
     {
         $nota = $request->input('nota');
-        $pesanan = DB::table('pesanan')->where('nomor_nota', $nota)->first();
+        // Join ke tabel layanans agar pelanggan tahu mereka mengambil paket apa
+        $pesanan = DB::table('pesanan')
+            ->join('layanans', 'pesanan.layanan_id', '=', 'layanans.id')
+            ->select('pesanan.*', 'layanans.nama_layanan', 'layanans.jenis_satuan')
+            ->where('pesanan.nomor_nota', $nota)
+            ->first();
+
         return view('status_pelanggan', compact('pesanan', 'nota'));
     }
 
@@ -29,17 +35,15 @@ class LaundryController extends Controller
             return redirect('/admin/dashboard');
         }
         
-        // Kita ganti di sini jadi 'login_kasir' sesuai nama file kamu!
         return view('login_kasir');
     }
 
-   // 4. PROSES LOGIN KASIR (SUDAH DIGANTI JADI ADMIN - ADMIN)
+   // 4. PROSES LOGIN KASIR
     public function prosesLogin(Request $request)
     {
         $username = $request->input('username');
         $password = $request->input('password');
 
-        // Sekarang password-nya sudah diganti dari 'admin123' jadi 'admin'
         if ($username === 'admin' && $password === 'admin') {
             Session::put('kasir_logged_in', true);
             Session::put('kasir_username', $username);
@@ -60,39 +64,61 @@ class LaundryController extends Controller
         $jumlah_baru       = DB::table('pesanan')->where('status', 'Baru')->count();
         $jumlah_proses     = DB::table('pesanan')->where('status', 'Proses')->count();
         $jumlah_selesai    = DB::table('pesanan')->where('status', 'Selesai')->count();
-        $semua_pesanan     = DB::table('pesanan')->orderBy('id', 'desc')->get();
+        
+        // Ambil semua pesanan dan join dengan data layanan pendukungnya
+        $semua_pesanan     = DB::table('pesanan')
+            ->join('layanans', 'pesanan.layanan_id', '=', 'layanans.id')
+            ->select('pesanan.*', 'layanans.nama_layanan', 'layanans.jenis_satuan')
+            ->orderBy('pesanan.id', 'desc')
+            ->get();
 
-        return view('dashboard_kasir', compact('semua_pesanan', 'total_pendapatan', 'jumlah_baru', 'jumlah_proses', 'jumlah_selesai'));
+        // AMBIL MASTER DATA LAYANAN UNTUK DROPDOWN MODAL TAMBAH PESANAN
+        $daftarLayanan     = DB::table('layanans')->orderBy('kategori', 'asc')->get();
+
+        return view('dashboard_kasir', compact('semua_pesanan', 'total_pendapatan', 'jumlah_baru', 'jumlah_proses', 'jumlah_selesai', 'daftarLayanan'));
     }
 
-    // 6. TAMBAH PESANAN LAUNDRY BARU (GANTI NAMA JADI simpanPesanan BIAR SINKRON)
+    // 6. TAMBAH PESANAN LAUNDRY BARU (DINAMIS DENGAN KATEGORI DATA ALL CLEAN)
     public function simpanPesanan(Request $request)
     {
         if (!Session::has('kasir_logged_in')) { return redirect('/login'); }
 
-        $nama  = $request->input('nama_pelanggan');
-        $hp    = $request->input('nomor_hp');
-        $berat = $request->input('berat');
+        $nama       = $request->input('nama_pelanggan');
+        $hp         = $request->input('nomor_hp');
+        $layanan_id = $request->input('layanan_id');
+        $jumlah     = $request->input('jumlah'); // Bisa Kg / Pcs / Set
         
-        $nomor_nota = 'LND-' . rand(1000, 9999);
-        $harga_normal = $berat * 7000;
+        // 1. Cari info harga berdasarkan layanan yang dipilih kasir
+        $layanan = DB::table('layanans')->where('id', $layanan_id)->first();
+        if (!$layanan) {
+            return redirect()->back()->with('error', 'Layanan laundry tidak valid!');
+        }
 
+        $nomor_nota = 'LND-' . rand(1000, 9999);
+        
+        // 2. Kalkulasi harga dinamis berdasarkan harga master di database
+        $harga_normal = $jumlah * $layanan->harga;
+
+        // 3. Cek riwayat untuk diskon otomatis member 10%
         $cek_member = DB::table('pesanan')->where('nomor_hp', $hp)->exists();
 
         if ($cek_member) {
             $diskon = $harga_normal * 0.10;
             $total_harga = $harga_normal - $diskon;
-            $pesan_sukses = 'Pesanan baru ' . $nomor_nota . ' berhasil! 🎉 Selamat, No. HP ini terdeteksi sebagai Member Setia & mendapatkan Diskon 10% (Potongan Rp ' . number_format($diskon, 0, ',', '.') . ')';
+            $pesan_sukses = 'Pesanan baru ' . $nomor_nota . ' berhasil! 🎉 No. HP terdeteksi Member Setia & dapat Diskon 10% (Potongan Rp ' . number_format($diskon, 0, ',', '.') . ')';
         } else {
             $total_harga = $harga_normal;
             $pesan_sukses = 'Pesanan baru dengan Nota ' . $nomor_nota . ' berhasil ditambahkan!';
         }
 
+        // 4. Insert data menggunakan kolom relasi baru yang sudah dimodifikasi
         DB::table('pesanan')->insert([
             'nomor_nota'     => $nomor_nota,
             'nama_pelanggan' => $nama,
             'nomor_hp'       => $hp,
-            'berat_kg'       => $berat,
+            'layanan_id'     => $layanan_id ?? 0, // Mengisi ID layanan agar relasi tidak kosong (0)
+            'jumlah'         => $jumlah,          // Mengisi kolom jumlah (Wajib di database)
+            'berat_kg'       => $jumlah,          // Mengisi kolom berat_kg (Wajib di database)
             'total_harga'    => $total_harga,
             'status'         => 'Baru',
         ]);
@@ -100,13 +126,12 @@ class LaundryController extends Controller
         return redirect('/admin/dashboard')->with('success', $pesan_sukses);
     }
 
-    // 7. UPDATE STATUS PROGRES LAUNDRY (SUDAH DI-FIX ANTI ERROR COLUMN NOT FOUND)
+    // 7. UPDATE STATUS PROGRES LAUNDRY
     public function updateStatus(Request $request, $id)
     {
         if (!Session::has('kasir_logged_in')) { return redirect('/login'); }
         $status_baru = $request->input('status');
 
-        // Kita hapus updated_at nya karena kolomnya tidak ada di database kamu
         DB::table('pesanan')->where('id', $id)->update([
             'status' => $status_baru,
         ]);
@@ -118,7 +143,13 @@ class LaundryController extends Controller
     public function cetakNota($id)
     {
         if (!Session::has('kasir_logged_in')) { return redirect('/login'); }
-        $pesanan = DB::table('pesanan')->where('id', $id)->first();
+        
+        $pesanan = DB::table('pesanan')
+            ->join('layanans', 'pesanan.layanan_id', '=', 'layanans.id')
+            ->select('pesanan.*', 'layanans.nama_layanan', 'layanans.harga', 'layanans.jenis_satuan')
+            ->where('pesanan.id', $id)
+            ->first();
+
         if (!$pesanan) { return redirect('/admin/dashboard')->with('error', 'Data nota tidak ditemukan!'); }
         return view('cetak_nota', compact('pesanan'));
     }
@@ -127,7 +158,13 @@ class LaundryController extends Controller
     public function cetakLaporan()
     {
         if (!Session::has('kasir_logged_in')) { return redirect('/login'); }
-        $laporan = DB::table('pesanan')->orderBy('id', 'asc')->get();
+        
+        $laporan = DB::table('pesanan')
+            ->join('layanans', 'pesanan.layanan_id', '=', 'layanans.id')
+            ->select('pesanan.*', 'layanans.nama_layanan', 'layanans.jenis_satuan')
+            ->orderBy('pesanan.id', 'asc')
+            ->get();
+
         $total_omzet = DB::table('pesanan')->sum('total_harga');
         return view('cetak_laporan', compact('laporan', 'total_omzet'));
     }

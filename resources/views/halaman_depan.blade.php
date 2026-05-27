@@ -132,7 +132,7 @@
             margin-bottom: 15px;
         }
         
-        /* PRICE TAG UI */
+        /* PRICE TAG UI & SLIDER CUSTOM STYLES */
         .price-card {
             background: #fff;
             border: 1px solid #e2e8f0;
@@ -140,11 +140,65 @@
             padding: 30px;
             text-align: center;
             transition: all 0.3s;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .price-card:hover {
             border-color: #3b82f6;
             box-shadow: 0 15px 30px rgba(59, 130, 246, 0.08);
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+        }
+        .highlight-card {
+            border: 2px solid #3b82f6 !important;
+            background: linear-gradient(135deg, #f8fafc 0%, #f0fdf4 100%) !important;
+        }
+        
+        /* Modifikasi Dots Indikator Bulat di Bawah Slider */
+        .custom-indicators {
+            bottom: -55px !important;
+        }
+        .custom-indicators button {
+            width: 10px !important;
+            height: 10px !important;
+            border-radius: 50% !important;
+            background-color: #cbd5e1 !important;
+            border: none !important;
+            margin: 0 6px !important;
+            transition: all 0.3s ease;
+        }
+        .custom-indicators button.active {
+            background-color: #0ea5e9 !important; /* Warna toska aktif */
+            width: 24px !important;               /* Efek memanjang */
+            border-radius: 5px !important;
+        }
+
+        /* Tombol Navigasi Panah Kiri Kanan */
+        .custom-nav-btn {
+            width: 45px !important;
+            height: 45px !important;
+            background: #ffffff !important;
+            border-radius: 50% !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+        }
+        .custom-nav-btn:hover {
+            opacity: 1;
+            background: #f1f5f9 !important;
+            transform: translateY(-50%) scale(1.05) !important;
+        }
+        .carousel-control-prev { left: -25px !important; }
+        .carousel-control-next { right: -25px !important; }
+
+        @media (max-width: 768px) {
+            .carousel-control-prev { left: 5px !important; }
+            .carousel-control-next { right: 5px !important; }
+            .custom-indicators { bottom: -45px !important; }
         }
 
         /* NAVIGATION TAB TERMS & CONDITIONS */
@@ -182,9 +236,9 @@
             color: #0ea5e9;
         }
 
-        /* SECTION ORDER & PICKUP (STYLE TOSKA) */
+        /* SECTION ORDER & PICKUP */
         .order-section {
-            background: linear-gradient(rgba(14, 165, 233, 0.85), rgba(14, 165, 233, 0.85)), url('https://images.unsplash.com/photo-1545173168-9f1947e80175?q=80&w=1000') no-repeat center center;
+            background: linear-gradient(rgba(14, 165, 233, 0.85), rgba(14, 165, 233, 0.85)), url("{{ asset('images/bg-laundry.jpg') }}") no-repeat center center;
             background-size: cover;
             color: #ffffff;
             padding: 80px 0;
@@ -271,7 +325,6 @@
             align-items: center;
             justify-content: center;
         }
-
         /* MAPS CONTAINER */
         .map-responsive {
             overflow: hidden;
@@ -280,16 +333,16 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* PREMIUM UPGRADED FOOTER UI (REFERENSI GAMBAR CHINGU) */
+        /* PREMIUM UPGRADED FOOTER UI */
         .main-footer {
-            background-color: #e9ecef; /* Abu-abu terang sesuai gambar */
+            background-color: #e9ecef;
             padding: 60px 0 40px 0;
             color: #475569;
         }
         .footer-brand {
             font-size: 26px;
             font-weight: 800;
-            color: #0ea5e9; /* Toska premium */
+            color: #0ea5e9;
             text-decoration: none;
         }
         .footer-sub-brand {
@@ -346,7 +399,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-color: #0ea5e9; /* Warna bulat toska */
+            background-color: #0ea5e9;
             color: white;
             display: flex;
             align-items: center;
@@ -362,11 +415,70 @@
             box-shadow: 0 5px 12px rgba(14, 165, 233, 0.3);
         }
         .copyright-bar {
-            background-color: #0a8496; /* Gelap toska sesuai bagian bawah gambar */
+            background-color: #0a8496;
             color: white;
             padding: 15px 0;
             font-size: 14px;
             font-weight: 500;
+        }
+
+        /* --- CSS MANUAL UNTUK ANIMASI BULETAN JATUH DARI ATAS --- */
+        @keyframes dropFromTop {
+            0% {
+                opacity: 0;
+                transform: translateY(-350px); /* Posisi awal jauh di atas frame */
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(15px);   /* Sedikit memantul ke bawah */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);       /* Berhenti di posisi final pas */
+            }
+        }
+
+        /* Trigger AOS khusus untuk menjalankan Keyframe CSS di atas saat di-scroll */
+        [data-aos="drop-down-premium"] {
+            opacity: 0;
+            transition-property: transform, opacity;
+        }
+        [data-aos="drop-down-premium"].aos-animate {
+            animation: dropFromTop 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation-delay: 0.6s; /* Menunggu gambar ruko selesai memuat, baru buletan jatuh */
+        }
+
+        /* Desain Buletan Pengalaman (Diperbesar & Efek Shadow Lembut) */
+        .badge-experience-circle {
+            width: 155px;
+            height: 155px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: 5px solid #eff6ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+            z-index: 20;
+        }
+
+        /* Penyesuaian Responsif Layar Kecil / HP */
+        @media (max-width: 576px) {
+            .badge-experience-circle {
+                width: 115px;
+                height: 115px;
+                border: 4px solid #eff6ff;
+            }
+            .badge-experience-circle h1 {
+                font-size: 2.2rem !important;
+            }
+            .badge-experience-circle p {
+                font-size: 11px !important;
+            }
+            .wrapper-laundry-image {
+                margin-left: 20px !important; /* Memberikan space kiri di mobile agar lingkaran tidak terpotong layar */
+            }
         }
     </style>
 </head>
@@ -387,7 +499,7 @@
                 <a href="#tentang" class="btn-kasir small d-none d-sm-inline">Tentang Kami</a>
                 <a href="#harga" class="btn-kasir small d-none d-sm-inline">Daftar Harga</a>
                 <a href="#order" class="btn-kasir small d-none d-sm-inline">Pesan Pickup</a>
-                <a href="#syarat-ketentuan" class="btn-kasir small d-none d-sm-inline">Syarat & Ketentuan</a>
+                <a href="#syarat-ketentuan" class="btn-kasir small d-none d-sm-inline">Syarat &amp; Ketentuan</a>
                 <a href="#ulasan" class="btn-kasir small d-none d-sm-inline">Ulasan</a>
                 <a href="/login" class="btn btn-light rounded-pill px-4 shadow-sm fw-semibold btn-kasir border">
                     <i class="fas fa-lock me-1 small"></i> Area Kasir
@@ -400,7 +512,7 @@
         <div class="row justify-content-center align-items-center g-5">
             <div class="col-lg-6 text-center text-lg-start" data-aos="fade-right" data-aos-duration="1200">
                 <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-bold mb-3">
-                    <i class="fas fa-star me-1 text-warning"></i> LAUNDRY PREMIUM & KILAT
+                    <i class="fas fa-star me-1 text-warning"></i> LAUNDRY PREMIUM &amp; KILAT
                 </span>
                 <h1 class="hero-title display-4 mb-3">
                     Cek Status Cucian Anda <br class="d-none d-md-block">Secara <span>Real-Time</span>
@@ -464,20 +576,21 @@
     </section>
 
     <section id="tentang" class="bg-white section-padding border-top border-bottom">
-        <div class="container">
+        <div class="container py-3">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6" data-aos="fade-up" data-aos-duration="1000">
                     <span class="text-primary fw-bold small text-uppercase tracking-wider">Tentang Kami</span>
                     <h2 class="section-title display-6 mt-1">Solusi Cuci Bersih Tanpa Ribet</h2>
                     <p class="text-muted mb-4 lead">All Clean Laundry hadir untuk memberikan efisiensi waktu bagi Anda yang sibuk. Dengan teknologi modern dan detergen ramah lingkungan, kami memastikan setiap helai pakaian Anda kembali bersih cemerlang, higienis, dan wangi segar tahan lama.</p>
-                    <div class="row g-3">
-                        <div class="col-6">
+                    
+                    <div class="row g-3 mt-1">
+                        <div class="col-6 col-md-4">
                             <div class="border-start border-primary border-4 ps-3">
                                 <h4 class="fw-bold m-0 text-dark">100%</h4>
                                 <small class="text-muted">Garansi Kepuasan</small>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6 col-md-4">
                             <div class="border-start border-success border-4 ps-3">
                                 <h4 class="fw-bold m-0 text-dark">6 Jam</h4>
                                 <small class="text-muted">Layanan Tercepat</small>
@@ -485,52 +598,176 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 text-center" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="200">
-                    <div class="p-4 bg-light rounded-4 border border-dashed d-flex align-items-center justify-content-center" style="min-height: 250px;">
-                        <div class="text-center">
-                            <i class="fas fa-store-alt text-primary fa-4x mb-3 opacity-50"></i>
-                            <h5 class="fw-bold text-dark">Outlet Operasional</h5>
-                            <p class="text-muted small m-0">Buka Setiap Hari: 07.00 - 21.00 WIB</p>
+                
+                <div class="col-lg-6 text-center position-relative wrapper-laundry-image">
+                    <div class="position-relative d-inline-block shadow rounded-4" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="200" style="max-height: 400px; width: 100%; overflow: visible;">
+                        
+                        <div class="rounded-4 overflow-hidden" style="width: 100%; height: 100%; max-height: 400px;">
+                            <img src="{{ asset('images/ruko-laundry3.png') }}" class="img-fluid" alt="Foto Ruko All Clean Laundry" style="height: 100%; width: 100%; object-fit: cover;">
                         </div>
+
+                        <div class="position-absolute" 
+                             data-aos="drop-down-premium"
+                             data-aos-anchor-placement="top-bottom"
+                             style="bottom: -25px; left: -25px;">
+                            <div class="badge-experience-circle">
+                                <h1 class="fw-bold text-dark m-0" style="line-height: 1; font-size: 3.2rem; letter-spacing: -2px;">2+</h1>
+                                <p class="text-muted fw-bold m-0 mt-1" style="font-size: 13px; line-height: 1.2;">Tahun<br>Pengalaman</p>
+                            </div>
+                        </div>
+                        
                     </div>
-                </div>
+                </div>            
             </div>
         </div>
     </section>
 
-    <section id="harga" class="section-padding">
+        <section id="harga" class="section-padding" style="background-color: #ffffff;">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="1000">
-                <span class="text-primary fw-bold small text-uppercase tracking-wider">Daftar Layanan</span>
+                <span class="text-primary fw-bold small text-uppercase tracking-wider" style="letter-spacing: 1px;">Daftar Layanan</span>
                 <h2 class="section-title display-6 mt-1">Tarif Laundry Terjangkau</h2>
                 <p class="text-muted small mx-auto" style="max-width: 500px;">Harga transparan, hasil pengerjaan maksimal, pas di kantong mahasiswa maupun keluarga.</p>
             </div>
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
-                    <div class="price-card">
-                        <div class="text-primary mb-3"><i class="fas fa-tshirt fa-2x"></i></div>
-                        <h5 class="fw-bold text-dark">Cuci Lipat Reguler</h5>
-                        <p class="text-muted small mb-4">Estimasi selesai 2 hari kerja</p>
-                        <h3 class="fw-bold text-success mb-0">Rp 7.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
-                    </div>
+
+            <div id="layananCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                
+                <div class="carousel-indicators custom-indicators">
+                    <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
                 </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
-                    <div class="price-card" style="border-color: #3b82f6; background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);">
-                        <div class="text-success mb-3"><i class="fas fa-shipping-fast fa-2x"></i></div>
-                        <h5 class="fw-bold text-dark">Cuci Setrika Kilat</h5>
-                        <p class="text-muted small mb-4">Estimasi selesai 24 jam</p>
-                        <h3 class="fw-bold text-success mb-0">Rp 12.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+
+                <div class="carousel-inner px-md-5">
+                    
+                    <div class="carousel-item active">
+                        <div class="row g-4 justify-content-center m-1">
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-primary mb-3"><i class="fas fa-tshirt fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Cuci Kering Lipat</h5>
+                                    <span class="badge bg-light text-secondary mb-3 rounded-pill px-3 py-1">Reguler 2 Hari</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 5.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card highlight-card">
+                                    <div class="text-primary mb-3"><i class="fas fa-shirt fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Cuci Kering Setrika</h5>
+                                    <span class="badge bg-primary text-white mb-3 rounded-pill px-3 py-1">Paling Populer</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 8.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-primary mb-3"><i class="fas fa-face-smile fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Setrika Saja</h5>
+                                    <span class="badge bg-light text-secondary mb-3 rounded-pill px-3 py-1">Reguler 2 Hari</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 5.500<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
-                    <div class="price-card">
-                        <div class="text-warning mb-3"><i class="fas fa-bed fa-2x"></i></div>
-                        <h5 class="fw-bold text-dark">Cuci Bed Cover</h5>
-                        <p class="text-muted small mb-4">Estimasi selesai 2-3 hari</p>
-                        <h3 class="fw-bold text-success mb-0">Rp 35.000<span class="fs-6 text-muted fw-normal"> / Pcs</span></h3>
+
+                    <div class="carousel-item">
+                        <div class="row g-4 justify-content-center m-1">
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-warning mb-3"><i class="fas fa-bolt fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Cuci Kering Lipat</h5>
+                                    <span class="badge bg-warning-subtle text-warning-emphasis mb-3 rounded-pill px-3 py-1">Express 1 Hari</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 9.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-warning mb-3"><i class="fas fa-shipping-fast fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Cuci Kering Setrika</h5>
+                                    <span class="badge bg-warning text-dark mb-3 rounded-pill px-3 py-1 fw-bold">Express 1 Hari</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 13.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-warning mb-3"><i class="fas fa-gauge-high fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Setrika Saja</h5>
+                                    <span class="badge bg-warning-subtle text-warning-emphasis mb-3 rounded-pill px-3 py-1">Express 1 Hari</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 9.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="carousel-item">
+                        <div class="row g-4 justify-content-center m-1">
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-danger mb-3"><i class="fas fa-wind fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Cuci Kering Lipat</h5>
+                                    <span class="badge bg-danger-subtle text-danger mb-3 rounded-pill px-3 py-1">Kilat 4 Jam</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 12.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card" style="border: 2px solid #dc3545;">
+                                    <div class="text-danger mb-3"><i class="fas fa-rocket fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Cuci Kering Setrika</h5>
+                                    <span class="badge bg-danger text-white mb-3 rounded-pill px-3 py-1">Super Kilat 4 Jam</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 16.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-danger mb-3"><i class="fas fa-stopwatch fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Setrika Saja</h5>
+                                    <span class="badge bg-danger-subtle text-danger mb-3 rounded-pill px-3 py-1">Kilat 4 Jam</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 12.000<span class="fs-6 text-muted fw-normal"> / Kg</span></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="row g-4 justify-content-center m-1">
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-info mb-3"><i class="fas fa-bed fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Bedcover Double</h5>
+                                    <span class="badge bg-info-subtle text-info-emphasis mb-3 rounded-pill px-3 py-1">Perlengkapan</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 35.000<span class="fs-6 text-muted fw-normal"> / Pcs</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-info mb-3"><i class="fas fa-bed fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Selimut Besar</h5>
+                                    <span class="badge bg-info-subtle text-info-emphasis mb-3 rounded-pill px-3 py-1">Perlengkapan</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 25.000<span class="fs-6 text-muted fw-normal"> / Pcs</span></h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="price-card">
+                                    <div class="text-info mb-3"><i class="fas fa-shoe-prints fa-2x"></i></div>
+                                    <h5 class="fw-bold text-dark mb-1">Cuci Sepatu</h5>
+                                    <span class="badge bg-info text-dark mb-3 rounded-pill px-3 py-1 fw-bold">Special Treatment</span>
+                                    <h3 class="fw-bold text-success mb-0">Rp 50.000<span class="fs-6 text-muted fw-normal"> / Pasang</span></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
+                <button class="carousel-control-prev custom-nav-btn" type="button" data-bs-target="#layananCarousel" data-bs-slide="prev">
+                    <i class="fas fa-chevron-left text-dark fs-5"></i>
+                </button>
+                <button class="carousel-control-next custom-nav-btn" type="button" data-bs-target="#layananCarousel" data-bs-slide="next">
+                    <i class="fas fa-chevron-right text-dark fs-5"></i>
+                </button>
             </div>
+            
+            <div class="py-4"></div>
         </div>
     </section>
 
@@ -700,7 +937,7 @@
         </div>
     </section>
 
-    <section class="container mb-5 pb-5">
+   <section class="container mb-5 pb-5">
         <div class="text-center mb-4">
             <span class="text-primary fw-bold small text-uppercase tracking-wider">Lokasi Outlet</span>
             <h3 class="fw-bold text-dark mt-1">Kunjungi Toko Fisik Kami</h3>
@@ -772,7 +1009,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({

@@ -61,9 +61,21 @@
 
                         <div class="p-3 bg-light rounded-3 mt-4">
                             <h6 class="fw-bold mb-3 text-secondary small text-uppercase tracking-wider">Rincian Transaksi</h6>
+                            
                             <div class="d-flex justify-content-between mb-2 small">
-                                <span class="text-muted">Berat Cucian</span>
-                                <span class="fw-semibold text-dark">{{ $pesanan->berat_kg ?? 0 }} Kg</span>
+                                <span class="text-muted">Jenis Layanan</span>
+                                <span class="fw-semibold text-dark">{{ $pesanan->nama_layanan ?? 'Layanan Umum' }}</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span class="text-muted">Berat / Jumlah</span>
+                                <span class="fw-semibold text-dark">
+                                    @if(($pesanan->berat_kg ?? 0) > 0)
+                                        {{ $pesanan->berat_kg }} Kg
+                                    @else
+                                        {{ $pesanan->jumlah ?? 0 }} Pcs
+                                    @endif
+                                </span>
                             </div>
                             <div class="d-flex justify-content-between mb-2 small">
                                 <span class="text-muted">Total Tagihan</span>
