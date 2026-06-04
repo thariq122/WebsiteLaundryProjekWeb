@@ -60,6 +60,12 @@
         .btn-action:hover {
             transform: scale(1.08);
         }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
@@ -67,7 +73,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm py-3">
         <div class="container">
             <a class="navbar-brand fw-bold fs-4" href="#">
-                <i class="fas fa-layer-group text-info me-2"></i>ALL CLEAN <span class="text-info">SaaS</span>
+                <img src="{{ asset('images/logo.png') }}" alt="All Clean Laundry" class="brand-logo me-2">
+                ALL CLEAN <span class="text-info">SaaS</span>
             </a>
             <div class="d-flex align-items-center">
                 <span class="text-white small me-3 opacity-90 fw-medium">

@@ -45,6 +45,12 @@
             color: #2563eb;
         }
 
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
         /* HERO AREA */
         .hero-section {
             padding-top: 60px;
@@ -493,7 +499,8 @@
     <nav class="navbar navbar-expand-lg pt-4 bg-transparent" data-aos="fade-down" data-aos-duration="1000">
         <div class="container">
             <a class="navbar-brand text-dark fs-4 fw-bold" href="/">
-                <i class="fas fa-soap text-primary me-2"></i>ALL CLEAN LAUNDRY
+                <img src="{{ asset('images/logo.png') }}" alt="All Clean Laundry" class="brand-logo me-2">
+                ALL CLEAN LAUNDRY
             </a>
             <div class="d-flex gap-3 align-items-center">
                 <a href="#tentang" class="btn-kasir small d-none d-sm-inline">Tentang Kami</a>
