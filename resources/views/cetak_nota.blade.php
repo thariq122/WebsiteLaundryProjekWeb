@@ -50,6 +50,9 @@
         <tr>
             <td colspan="2">No. HP   : {{ $pesanan->nomor_hp ?? '-' }}</td>
         </tr>
+        <tr>
+            <td colspan="2">Estimasi selesai: {{ $pesanan->kategori ?? '-' }}</td>
+        </tr>
     </table>
 
     <div class="line"></div>
@@ -64,8 +67,8 @@
         </thead>
         <tbody>
             <tr>
-                <td>Cuci Kiloan Reguler<br><small style="font-size: 11px;">@Rp 7.000 / Kg</small></td>
-                <td class="text-center">{{ $pesanan->berat_kg ?? 0 }} Kg</td>
+                <td>{{ $pesanan->nama_layanan ?? 'Layanan Laundry' }}<br><small style="font-size: 11px;">@Rp {{ number_format($pesanan->harga ?? 0, 0, ',', '.') }} / {{ $pesanan->jenis_satuan ?? 'Kg' }}</small></td>
+                <td class="text-center">{{ $pesanan->jumlah ?? $pesanan->berat_kg ?? 0 }} {{ $pesanan->jenis_satuan ?? 'Kg' }}</td>
                 <td class="text-right">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</td>
             </tr>
         </tbody>

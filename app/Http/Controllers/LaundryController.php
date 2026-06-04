@@ -146,7 +146,7 @@ class LaundryController extends Controller
         
         $pesanan = DB::table('pesanan')
             ->join('layanans', 'pesanan.layanan_id', '=', 'layanans.id')
-            ->select('pesanan.*', 'layanans.nama_layanan', 'layanans.harga', 'layanans.jenis_satuan')
+            ->select('pesanan.*', 'layanans.nama_layanan', 'layanans.harga', 'layanans.jenis_satuan', 'layanans.kategori')
             ->where('pesanan.id', $id)
             ->first();
 
