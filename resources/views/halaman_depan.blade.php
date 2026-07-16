@@ -34,6 +34,29 @@
             border-bottom-right-radius: 60px;
         }
 
+        /* STICKY NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, padding-top 0.3s ease, padding-bottom 0.3s ease;
+        }
+        .navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 20px rgba(15, 23, 42, 0.08);
+            padding-top: 10px !important;
+            padding-bottom: 10px !important;
+        }
+
+        /* Offset konten agar tidak tertutup navbar fixed */
+        body {
+            padding-top: 80px;
+        }
+
         /* AREA LINK KASIR */
         .btn-kasir {
             color: #64748b;
@@ -496,7 +519,7 @@
 
     <div class="bg-decoration"></div>
 
-    <nav class="navbar navbar-expand-lg pt-4 bg-transparent" data-aos="fade-down" data-aos-duration="1000">
+    <nav class="navbar navbar-expand-lg pt-4" id="mainNavbar">
         <div class="container">
             <a class="navbar-brand text-dark fs-4 fw-bold" href="/">
                 <img src="{{ asset('images/logo.png') }}" alt="All Clean Laundry" class="brand-logo me-2">
@@ -1021,6 +1044,16 @@
         AOS.init({
             once: true, 
             offset: 100
+        });
+
+        // Sticky Navbar: tambah class 'scrolled' saat user scroll ke bawah
+        const navbar = document.getElementById('mainNavbar');
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
         });
     </script>
 </body>
