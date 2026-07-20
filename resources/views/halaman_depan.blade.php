@@ -522,7 +522,7 @@
     <nav class="navbar navbar-expand-lg pt-4" id="mainNavbar">
         <div class="container">
             <a class="navbar-brand text-dark fs-4 fw-bold" href="/">
-                <img src="{{ asset('images/logo.png') }}" alt="All Clean Laundry" class="brand-logo me-2">
+                <img src="{{ asset('images/Logo.png') }}" alt="All Clean Laundry" class="brand-logo me-2">
                 ALL CLEAN LAUNDRY
             </a>
             <div class="d-flex gap-3 align-items-center">
