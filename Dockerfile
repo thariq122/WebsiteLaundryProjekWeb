@@ -35,9 +35,6 @@ RUN npm install
 # Build frontend
 RUN npm run build
 
-# Generate APP_KEY jika belum ada
-RUN php artisan key:generate --force || true
+EXPOSE 8080
 
-EXPOSE 10000
-
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
