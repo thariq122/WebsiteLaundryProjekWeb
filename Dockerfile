@@ -1,45 +1,43 @@
-# Menggunakan image PHP 8.2 resmi
 FROM php:8.2-cli
 
-# Install package yang dibutuhkan Laravel
+# Install system packages
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
-    curl \
     zip \
+    curl \
     libzip-dev \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    nodejs \
-    npm
+    default-mysql-client
 
-# Install ekstensi PHP
+# Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql zip
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Menentukan folder kerja
+# Install Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
 WORKDIR /app
 
-# Copy semua project
 COPY . .
 
-# Install dependency PHP
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install dependency Node
+# Install Node dependencies
 RUN npm install
 
-# Build Vite
+# Build frontend
 RUN npm run build
 
 # Generate APP_KEY jika belum ada
-RUN php artisan key:generate --force
+RUN php artisan key:generate --force || true
 
-# Buka port Render
 EXPOSE 10000
 
-# Jalankan Laravel
 CMD php artisan serve --host=0.0.0.0 --port=10000
