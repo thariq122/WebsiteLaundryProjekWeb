@@ -18,7 +18,7 @@ RUN docker-php-ext-install pdo pdo_mysql zip
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Install Node.js
+# Install Node.js 20
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
@@ -26,10 +26,15 @@ WORKDIR /app
 
 COPY . .
 
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
+
+# Install Node dependencies
 RUN npm install
+
+# Build frontend
 RUN npm run build
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$PORT"]
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
